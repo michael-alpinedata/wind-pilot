@@ -7,5 +7,9 @@ requires-python = ">=3.14"
 dependencies = [
     "dbt-postgres>=1.11.0",
     "dlt[postgres]>=1.29.1",
+    "pandas>=3.0.5",
+    "plotly>=6.9.0",
     "requests>=2.34.2",
+    "sqlalchemy>=2.0.51",
+    "streamlit>=1.60.0",
 ]
