@@ -1,0 +1,73 @@
+name: Pipeline vent Pioupiou (dlt + dbt)
+
+on:
+  schedule:
+    # Toutes les heures, à H:05 (marge pour laisser l'API se mettre à jour)
+    - cron: "5 * * * *"
+  workflow_dispatch:
+    inputs:
+      backfill_date:
+        description: "Date de backfill (YYYY-MM-DD), laisser vide pour un run incrémental normal"
+        required: false
+        default: ""
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # Secrets à créer dans Settings > Secrets and variables > Actions du repo.
+      # Utiliser l'endpoint Neon DIRECT (sans "-pooler") — voir les échanges
+      # précédents sur le pooler PgBouncer qui casse dlt.
+
+      # Config dlt via variables d'environnement (pas de secrets.toml en CI) :
+      # le mapping suit la structure destination.postgres.credentials.*
+      DESTINATION__POSTGRES__CREDENTIALS__HOST: ${{ secrets.NEON_HOST }}
+      DESTINATION__POSTGRES__CREDENTIALS__DATABASE: ${{ secrets.NEON_DB }}
+      DESTINATION__POSTGRES__CREDENTIALS__USERNAME: ${{ secrets.NEON_USER }}
+      DESTINATION__POSTGRES__CREDENTIALS__PASSWORD: ${{ secrets.NEON_PASSWORD }}
+      DESTINATION__POSTGRES__CREDENTIALS__PORT: "5432"
+      DESTINATION__POSTGRES__CREDENTIALS__QUERY__SSLMODE: "require"
+
+      # Config dbt (lues via env_var() dans dbt_project/profiles.yml)
+      NEON_HOST: ${{ secrets.NEON_HOST }}
+      NEON_DB: ${{ secrets.NEON_DB }}
+      NEON_USER: ${{ secrets.NEON_USER }}
+      NEON_PASSWORD: ${{ secrets.NEON_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          python-version: "3.12"
+
+      - name: Installer les deps (extras dlt + dbt uniquement, pas streamlit)
+        run: uv sync --extra dlt --extra dbt
+
+      - name: Run dlt (incrémental ou backfill)
+        run: |
+          if [ -n "${{ github.event.inputs.backfill_date }}" ]; then
+            uv run python dlt_pipeline/pipeline.py --backfill "${{ github.event.inputs.backfill_date }}" --log-level INFO
+          else
+            uv run python dlt_pipeline/pipeline.py --log-level INFO
+          fi
+
+      - name: dbt deps
+        run: uv run dbt deps --project-dir dbt_project --profiles-dir dbt_project
+
+      - name: dbt source freshness
+        # Ne bloque pas le job : juste après un chargement dlt qui vient de
+        # réussir, la fraîcheur devrait toujours être bonne. Sert surtout de
+        # garde-fou si dlt a tourné sans erreur mais sans rien remonté.
+        continue-on-error: true
+        run: uv run dbt source freshness --project-dir dbt_project --profiles-dir dbt_project
+
+      - name: dbt build (staging -> intermediate -> marts + tests)
+        run: uv run dbt build --project-dir dbt_project --profiles-dir dbt_project
+
+      - name: Résumé en cas d'échec
+        if: failure()
+        run: echo "Le run a échoué — voir les logs ci-dessus (dlt, freshness, ou tests dbt)."
