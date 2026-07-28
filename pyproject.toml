@@ -1,15 +1,27 @@
 [project]
 name = "wind-pilot"
 version = "0.1.0"
-description = "a pipeline + dashboard to analyze wind conditions at the Bourget Lake"
-readme = "README.md"
-requires-python = ">=3.14"
-dependencies = [
-    "dbt-postgres>=1.11.0",
-    "dlt[postgres]>=1.29.1",
-    "pandas>=3.0.5",
-    "plotly>=6.9.0",
-    "requests>=2.34.2",
-    "sqlalchemy>=2.0.51",
-    "streamlit>=1.60.0",
+description = "Wind data pipeline (OpenWindMap station 2176) — Lac du Bourget"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dlt = [
+    "dlt[postgres]>=1.0",
+    "requests>=2.31",
 ]
+dbt = [
+    "dbt-postgres>=1.8",
+]
+streamlit = [
+    "streamlit>=1.35",
+    "plotly>=5.20",
+    "sqlalchemy>=2.0",
+    "psycopg2-binary>=2.9",
+    "pandas>=2.2",
+]
+
+[tool.uv]
+# Not an installable Python package (no src/, no cross-folder imports) —
+# just a dependency grouping by concern.
+package = false
