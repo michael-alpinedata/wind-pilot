@@ -1,0 +1,16 @@
+# À copier vers ~/.dbt/profiles.yml (ou adapter le chemin via --profiles-dir).
+# Ne jamais committer la version avec les vrais identifiants.
+
+pioupiou_wind:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: your-project.neon.tech
+      user: your_neon_username
+      password: your_neon_password
+      port: 5432
+      dbname: neondb
+      schema: dbt_dev
+      threads: 4
+      sslmode: require
