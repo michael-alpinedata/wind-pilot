@@ -1,0 +1,7 @@
+[project]
+name = "wind-pilot"
+version = "0.1.0"
+description = "a pipeline + dashboard to analyze wind conditions at the Bourget Lake"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
