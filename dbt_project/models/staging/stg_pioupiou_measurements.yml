@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_pioupiou_measurements
+    description: "Mesures nettoyées et typées, granularité = un relevé"
+    columns:
+      - name: station_id
+        tests:
+          - not_null
+      - name: measured_at
+        tests:
+          - not_null
+      - name: wind_avg_kmh
+        tests:
+          - not_null
+      - name: wind_direction_deg
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 360
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - station_id
+              - measured_at

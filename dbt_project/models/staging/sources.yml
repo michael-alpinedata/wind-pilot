@@ -1,0 +1,36 @@
+version: 2
+
+sources:
+  - name: raw_pioupiou
+    description: "Données brutes chargées par dlt depuis l'API Pioupiou"
+    schema: raw_pioupiou
+    tables:
+      - name: measurements
+        description: "Mesures brutes de la balise 2176 (une ligne par relevé)"
+        loaded_at_field: time
+        freshness:
+          # En pratique la balise transmet plusieurs fois par heure en journée.
+          # Un warn à 3h et un error à 12h laisse de la marge pour la nuit
+          # sans pour autant masquer une vraie panne API/station.
+          warn_after: {count: 3, period: hour}
+          error_after: {count: 12, period: hour}
+        columns:
+          - name: station_id
+            tests:
+              - not_null
+          - name: time
+            tests:
+              - not_null
+          - name: wind_speed_avg
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  arguments:
+                    min_value: 0
+                    max_value: 150  # km/h, large marge pour ne pas bloquer sur un pic réel
+          - name: wind_heading
+            tests:
+              - dbt_utils.accepted_range:
+                  arguments:
+                    min_value: 0
+                    max_value: 360
