@@ -1,0 +1,20 @@
+# Ce fichier ne contient aucun secret : les valeurs viennent des variables
+# d'environnement (NEON_HOST, NEON_DB, NEON_USER, NEON_PASSWORD), injectées
+# par le GitHub Action via les secrets du repo. Utilisable tel quel en CI.
+#
+# En local, tu peux soit exporter ces mêmes variables, soit repartir de
+# profiles.yml.example si tu préfères des valeurs en dur pour ton usage perso.
+
+pioupiou_wind:
+  target: prod
+  outputs:
+    prod:
+      type: postgres
+      host: "{{ env_var('NEON_HOST') }}"
+      user: "{{ env_var('NEON_USER') }}"
+      password: "{{ env_var('NEON_PASSWORD') }}"
+      port: 5432
+      dbname: "{{ env_var('NEON_DB') }}"
+      schema: dbt_prod
+      threads: 4
+      sslmode: require
