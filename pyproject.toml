@@ -5,6 +5,7 @@ description = "a pipeline + dashboard to analyze wind conditions at the Bourget 
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "dbt-postgres>=1.11.0",
     "dlt[postgres]>=1.29.1",
     "requests>=2.34.2",
 ]
