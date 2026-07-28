@@ -1,0 +1,5 @@
+*/.dlt/secrets.toml
+*/.dlt/*.db
+__pycache__/
+*.pyc
+.venv/
