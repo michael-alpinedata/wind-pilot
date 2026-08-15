@@ -38,7 +38,7 @@ def get_engine():
 
 
 @st.cache_data(ttl=3600)
-def load_mart(table_name: str, schema: str = "dbt_dev_marts") -> pd.DataFrame:
+def load_mart(table_name: str, schema: str = "dbt_prod_marts") -> pd.DataFrame:
     engine = get_engine()
     return pd.read_sql(f"select * from {schema}.{table_name}", engine)
 
@@ -157,7 +157,7 @@ fig_ts.update_layout(
     xaxis_title="Date",
     hovermode="x unified",
 )
-st.plotly_chart(fig_ts, use_container_width=True)
+st.plotly_chart(fig_ts, width='stretch')
 
 # ---------------------------------------------------------------------------
 # 2. Profil horaire type (avec explication P90)
@@ -205,7 +205,7 @@ fig_hourly.update_layout(
     yaxis_title=unit_symbol,
     hovermode="x unified",
 )
-st.plotly_chart(fig_hourly, use_container_width=True)
+st.plotly_chart(fig_hourly, width='stretch')
 
 # ---------------------------------------------------------------------------
 # 3. Saisonnalité mensuelle
@@ -223,7 +223,7 @@ with col1:
     fig_monthly.update_layout(
         yaxis_title=unit_symbol, xaxis_title="Mois", title="Vitesse moyenne"
     )
-    st.plotly_chart(fig_monthly, use_container_width=True)
+    st.plotly_chart(fig_monthly, width='stretch')
 
 with col2:
     threshold_converted = 12 * factor
@@ -240,7 +240,7 @@ with col2:
         xaxis_title="Mois",
         title=f"% du temps navigable (> {threshold_converted:.1f} {unit_symbol})",
     )
-    st.plotly_chart(fig_pct, use_container_width=True)
+    st.plotly_chart(fig_pct, width='stretch')
 
 # ---------------------------------------------------------------------------
 # 4. Rose des vents (Orientée Nord en haut, Est à droite)
@@ -281,7 +281,7 @@ fig_rose.update_layout(
     ),
     legend=dict(orientation="h"),
 )
-st.plotly_chart(fig_rose, use_container_width=True)
+st.plotly_chart(fig_rose, width='stretch')
 
 # ---------------------------------------------------------------------------
 # 5. Assistant Recommandation Matos Wing Foil (Projet Capstone LLM Zoomcamp)
