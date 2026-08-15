@@ -34,7 +34,9 @@ def get_engine():
         st.stop()
 
     url = f"postgresql+psycopg2://{user}:{password}@{host}/{db}?sslmode=require"
-    return create_engine(url)
+    
+    # Ajout de pool_pre_ping=True pour recycler les connexions mortes (spécifique aux DB serverless)
+    return create_engine(url, pool_pre_ping=True)
 
 
 @st.cache_data(ttl=3600)
