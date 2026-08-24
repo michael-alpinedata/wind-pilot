@@ -36,6 +36,9 @@ jobs:
       NEON_USER: ${{ secrets.NEON_USER }}
       NEON_PASSWORD: ${{ secrets.NEON_PASSWORD }}
 
+      # Autoriser l'adaptateur postgres sur dbt 2.0+
+      DBT_ALLOW_EXPERIMENTAL_ADAPTERS: "true"
+
     steps:
       - uses: actions/checkout@v4
 
