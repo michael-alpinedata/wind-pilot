@@ -11,7 +11,8 @@ dlt = [
     "requests>=2.31",
 ]
 dbt = [
-    "dbt-postgres>=1.8",
+    "dbt-core>=1.8.0,<2.0.0",
+    "dbt-postgres>=1.8.0,<2.0.0",
 ]
 streamlit = [
     "streamlit>=1.35",
